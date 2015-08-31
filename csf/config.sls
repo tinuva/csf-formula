@@ -1,5 +1,30 @@
-{%- set csf = pillar.get('csf', {}) %}
+{%- from "csf/map.jinja" import csf with context %}
 {%- set config = csf.config|default({}) %}
+
+{%- from "csf/cluster.yaml" import cluster %}
+{%- if config.cluster_config is defined %}
+{%- set cluster_config = config.cluster_config %}
+{%- else %}
+{%- set cluster_config = cluster.cluster_config %}
+{%- endif %}
+
+{%- if config.cluster_sendto is defined %}
+{%- set cluster_sendto = config.cluster_sendto %}
+{%- else %}
+{%- set cluster_sendto = cluster.cluster_sendto %}
+{%- endif %}
+
+{%- if config.cluster_recvfrom is defined %}
+{%- set cluster_recvfrom = config.cluster_recvfrom %}
+{%- else %}
+{%- set cluster_recvfrom = cluster.cluster_recvfrom %}
+{%- endif %}
+
+{%- if config.cluster_master is defined %}
+{%- set cluster_master = config.cluster_master %}
+{%- else %}
+{%- set cluster_master = cluster.cluster_master %}
+{%- endif %}
 
 csf_ignore:
   file.managed:
@@ -37,6 +62,10 @@ csf_config:
     - template: jinja
     - context:
         config: {{ config }}
+        cluster_config: {{ cluster_config }}
+        cluster_sendto: {{ cluster_sendto }}
+        cluster_recvfrom: {{ cluster_recvfrom }}
+        cluster_master: {{ cluster_master }}
 
 #Blank CSFPRE to allow for watch
 csf_csfpre:
