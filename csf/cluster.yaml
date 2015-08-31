@@ -1,0 +1,36 @@
+# vim: sts=2 ts=2 sw=2 et ai
+#
+# SET ALL PARAMS IN CONFIG SECTION USING UNDERSCORE, NOT HYPHEN
+# so that it works correctly
+
+{%- set send_ipaddress = "" %}
+{%- set recv_ipaddress = "" %}
+{%- set master_ip = "" %}
+{%- set cluster_config = '0' %}
+
+{%- if grains['csfclustername'] is defined  -%}
+  {%- set cluster_config = 1 %}
+  {%- set clustername = salt['grains.get']('csfclustername') %}
+  {%- set ipaddress = [] %}
+  {%- set hosts = salt['mine.get']('G@roles:csf-cluster and G@csfclustername:' ~ clustername, 'network.ip_addrs', 'compound') %}
+
+  {%- set master_ip_list = salt['mine.get']('G@roles:csf-cluster-master and G@csfclustername:' ~ clustername, 'network.ip_addrs', 'compound').values()[0] %}
+  {%- if master_ip_list is defined -%}
+    {%- set master_ip = master_ip_list[0] %}
+    {%- do ipaddress.append(master_ip_list[0]) %}
+  {%- endif -%}  
+
+  {%- for id, ips in hosts.iteritems() %}
+    {%- do ipaddress.append(ips[0]) %}
+  {%- endfor %}
+
+  {%- set send_ipaddress = ",".join(ipaddress) %}
+  {%- set recv_ipaddress = ",".join(ipaddress) %}
+{% endif %}
+
+{% load_yaml as cluster %}
+cluster_config: {{ cluster_config }}
+cluster_sendto: {{ send_ipaddress }}
+cluster_recvfrom: {{ recv_ipaddress }}
+cluster_master: {{ master_ip }}
+{% endload %}
