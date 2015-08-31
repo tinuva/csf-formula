@@ -19,17 +19,14 @@ Salt Stack Formula to set up and configure CSF (ConfigServer Security & Firewall
 
 3. Include this Formula within another Formula or simply define your needed states within the Salt top file (``/srv/salt/top.sls``)
 
-4. Assign csf role to the  nodes in the CSF cluster
+4. Assign csf-cluster-master role to the master node in the CSF cluster
+	* salt \<node\> grains.setval roles ['csf-cluster','csf-cluster-master']
+
+5. Assign csf-cluster role to the remaining nodes in the CSF cluster
 	* salt \<node\> grains.setval roles ['csf-cluster']
 
-5. Assign csf role to the  nodes in the CSF cluster
-	* salt \<node\> grains.setval csfclustername 'csf'
-
-6. Run CSF state on the node master role
-	* salt \<base_node\> state.sls csf
-
-7. Run CSF state on remaning nodes
-	* salt \<slave_node\> state.sls csf 
+6. Run CSF state on the nodes
+	* salt \<nodes\> state.sls csf
 
 ## Available states
 
